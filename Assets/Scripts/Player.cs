@@ -16,6 +16,12 @@ public class Player : NetworkBehaviour {
     [ServerRpc]
     void RequestPositionForMovementServerRpc(Vector3 movement){
         Position.Value += movement;
+
+        float planeSize = 5f;
+        Vector3 newPosition = Position.Value + movement;
+        newPosition.x = Mathf.Clamp(newPosition.x, planeSize *-1, planeSize);
+        newPosition.z = Mathf.Clamp(newPosition.z, planeSize *-1, planeSize);
+        Position.Value = newPosition;
     }
 
     private void Update(){
