@@ -4,8 +4,30 @@ using UnityEngine;
 public class Player : NetworkBehaviour {
 
     public NetworkVariable<Vector3> Position = new NetworkVariable<Vector3>();
+    public NetworkVariable<Color> PlayerColor = new NetworkVariable<Color>(Color.red);
+    private GameManager _gameMgr;
 
     public float movementSpeed = 1.0f;
+
+    public override void OnNetworkSpawn(){
+        if (IsOwner){
+            _gameMgr = GameObject.Find("GameManager").GetComponent<GameManager>();
+            _gameMgr.RequestNewPlayerColorServerRpc();
+        }
+    }
+
+    public void Start(){
+        ApplyPlayerColor();
+        PlayerColor.OnValueChanged += OnPlayerColorChanged;
+    }
+
+    public void OnPlayerColorChanged(Color previous, Color current){
+        ApplyPlayerColor();
+    }
+
+    public void ApplyPlayerColor(){
+        GetComponent<MeshRenderer>().material.color = PlayerColor.Value;
+    }
 
     Vector3 CalcMovement(){
         Vector3 moveVect = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
